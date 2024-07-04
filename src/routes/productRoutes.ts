@@ -4,14 +4,12 @@ import {
   deleteProduct,
   getAllProducts,
   getProductById,
-  searchProducts,
   updateProduct,
 } from "../controllers/productController";
 
 const router = express.Router();
 
 router.post("/", createProduct);
-router.get("/", searchProducts);
 router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
 router.put("/:productId", updateProduct);

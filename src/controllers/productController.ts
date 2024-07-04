@@ -27,16 +27,46 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const products = await Product.find();
-    res.status(200).json({
+    const searchTerm = req.query.searchTerm as string;
+
+    if (!searchTerm) {
+      const products = await Product.find();
+      return res.status(200).json({
+        success: true,
+        message: "Products fetched successfully!",
+        data: products,
+      });
+    }
+    const regex = new RegExp(searchTerm, "i");
+
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: regex } },
+        { description: { $regex: regex } },
+        { category: { $regex: regex } },
+        { tags: { $in: [regex] } },
+      ],
+    });
+
+    if (products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No products matching search term '${searchTerm}' found`,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      message: "Products fetched successfully!",
+      message: `Products matching search term '${searchTerm}' fetched successfully!`,
       data: products,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+    return res.status(500).json({
       success: false,
       message: "Error fetching products",
+      data: null,
     });
   }
 };
@@ -129,52 +159,6 @@ export const deleteProduct = async (req: Request, res: Response) => {
       success: true,
       message: "Product deleted successfully!",
       data: null,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-      data: null,
-    });
-  }
-};
-
-export const searchProducts = async (req: Request, res: Response) => {
-  try {
-    const searchTerm = req.query.searchTerm as string;
-
-    if (!searchTerm) {
-      const products = await Product.find();
-      return res.status(200).json({
-        success: true,
-        message: "Products fetched successfully!",
-        data: products,
-      });
-    }
-    const regex = new RegExp(searchTerm, "i");
-
-    const products = await Product.find({
-      $or: [
-        { name: { $regex: regex } },
-        { description: { $regex: regex } },
-        { category: { $regex: regex } },
-        { tags: { $in: [regex] } },
-      ],
-    });
-
-    if (products.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `No products matching search term '${searchTerm}' found`,
-        data: null,
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: `Products matching search term '${searchTerm}' fetched successfully!`,
-      data: products,
     });
   } catch (error) {
     console.error(error);

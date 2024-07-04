@@ -43,3 +43,50 @@ export const createOrder = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const email = req.query.email as string;
+
+    if (!email) {
+      const orders = await Order.find();
+
+      if (orders.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No orders found",
+          data: null,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Orders fetched successfully!",
+        data: orders,
+      });
+    }
+
+    const orders = await Order.find({ email });
+
+    if (orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No orders found for email '${email}'`,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Orders fetched successfully for user email!`,
+      data: orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      data: null,
+    });
+  }
+};
