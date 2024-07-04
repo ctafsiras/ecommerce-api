@@ -12,7 +12,7 @@ This is a simple e-commerce API built with Express, TypeScript, MongoDB, Mongoos
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/ecommerce-api.git
+    git clone https://github.com/ctafsiras/ecommerce-api.git
     cd ecommerce-api
     ```
 
